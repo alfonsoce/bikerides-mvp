@@ -1,6 +1,8 @@
 
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
+import MapLeaflet from "../_components/MapLeaflet";
+import GeocoderInput from "../_components/GeocoderInput";
 
 /**
  * BikeRides – Prototipo funzionante (solo frontend)
@@ -550,13 +552,24 @@ function Filters({
           <Button onClick={()=> navigator.geolocation?.getCurrentPosition(pos => setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude }))} className="bg-gray-100">Usa posizione</Button>
         </div>
       </div>
-      <div className="rounded-3xl border p-3 bg-white">
-        <div className="text-sm font-medium mb-2">Mappa</div>
-        <div className="rounded-2xl overflow-hidden border">
-          <TinyMap center={center} onClick={onMapClick} />
-        </div>
-        <div className="text-xs text-gray-500 mt-1">Clicca per spostare il centro.</div>
-      </div>
+    <div className="rounded-3xl border p-3 bg-white">
+  <div className="text-sm font-medium mb-2">Mappa</div>
+
+  <GeocoderInput
+    onPick={(lat, lng) => setCenter({ lat, lng })}
+    placeholder="Cerca luogo (es. Milano Duomo)…"
+  />
+
+  <div className="rounded-2xl overflow-hidden border mt-2">
+    <MapLeaflet
+      center={center}
+      pins={[]}             // è la mappa dei filtri; i pin li mostriamo nel riquadro principale
+      onClick={(lat, lng) => onMapClick({ lat, lng })}
+    />
+  </div>
+  <div className="text-xs text-gray-500 mt-1">Clicca sulla mappa o cerca un luogo.</div>
+</div>
+
     </div>
   );
 }
