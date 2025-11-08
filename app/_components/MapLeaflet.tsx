@@ -35,10 +35,12 @@ function Recenter({ lat, lng, zoom }: { lat: number; lng: number; zoom: number }
 }
 
 export default function MapLeaflet({
+  center: centerProp,   // <-- ora è opzionale
   zoom = 12,
   pins = [],
   onClick,
 }: {
+  center?: { lat: number; lng: number };  // <-- opzionale
   zoom?: number;
   pins?: Pin[];
   onClick?: (lat: number, lng: number) => void;
@@ -46,28 +48,26 @@ export default function MapLeaflet({
   const key = process.env.NEXT_PUBLIC_MAPTILER_KEY!;
   const tiles = `https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${key}`;
 
-  // Stato per la posizione attuale
-  const [center, setCenter] = useState<{ lat: number; lng: number }>({
-    lat: 40.8518, // Napoli
-    lng: 14.2681,
-  });
+  // Stato interno del centro: usa prop se arriva, altrimenti Milano + GPS
+  const [center, setCenter] = useState<{ lat: number; lng: number }>(
+    centerProp ?? { lat: 45.4642, lng: 9.19 } // Milano
+  );
 
+  // Se la prop `center` cambia, aggiorna lo stato (controllo esterno)
   useEffect(() => {
-    if (typeof window !== "undefined" && "geolocation" in navigator) {
+    if (centerProp) setCenter(centerProp);
+  }, [centerProp]);
+
+  // Se NON c'è una prop `center`, prova il GPS e aggiorna il centro
+  useEffect(() => {
+    if (!centerProp && typeof window !== "undefined" && "geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setCenter({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          });
-        },
-        (err) => {
-          console.warn("GPS non disponibile, uso default:", err.message);
-        },
+        (pos) => setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {/* fallback: resta Milano */},
         { enableHighAccuracy: true, timeout: 5000 }
       );
     }
-  }, []);
+  }, [centerProp]);
 
   return (
     <MapContainer style={{ height: 340, width: "100%" }}>
