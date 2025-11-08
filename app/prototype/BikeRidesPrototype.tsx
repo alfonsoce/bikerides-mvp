@@ -1,7 +1,12 @@
 
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-import MapLeaflet from "../_components/MapLeaflet";
+import dynamic from "next/dynamic";
+// ⬇️ importa MapLeaflet solo sul client
+const MapLeaflet = dynamic(() => import("../_components/MapLeaflet"), { ssr: false });
+
+// ...resto dei tuoi import e codice...
+
 import GeocoderInput from "../_components/GeocoderInput";
 
 /**
