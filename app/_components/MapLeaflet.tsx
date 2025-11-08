@@ -45,19 +45,17 @@ export default function MapLeaflet({
   const tiles = `https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${key}`;
 
 return (
-  <MapContainer
-    style={{ height: 340, width: "100%" }}
-    // scrollWheelZoom={true}  ← rimuovi questa riga
-  >
-    <Recenter lat={center.lat} lng={center.lng} zoom={zoom} />
-    <TileLayer url={tiles} attribution="© OpenStreetMap © MapTiler" />
-    {onClick && <ClickHandler onClick={onClick} />}
-    {pins.map((p) => (
-      <Marker key={p.id} position={[p.lat, p.lng]} icon={markerIcon}>
-        <Popup>{p.title}</Popup>
-      </Marker>
-    ))}
-  </MapContainer>
+<MapContainer style={{ height: 340, width: "100%" }}>
+  <Recenter lat={center.lat} lng={center.lng} zoom={zoom} />
+  <TileLayer url={tiles} />  {/* <- niente attribution qui */}
+  {onClick && <ClickHandler onClick={onClick} />}
+  {pins.map((p) => (
+    <Marker key={p.id} position={[p.lat, p.lng]} icon={markerIcon}>
+      <Popup>{p.title}</Popup>
+    </Marker>
+  ))}
+</MapContainer>
+
 );
 
 }
