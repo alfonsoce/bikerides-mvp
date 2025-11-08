@@ -5,13 +5,17 @@ import L from "leaflet";
 
 type Pin = { id: string; lat: number; lng: number; title: string };
 
-const markerIcon = new L.Icon({
+// Icona default Leaflet
+const defaultIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
 });
+
+// Imposta l'icona come default per tutti i Marker (evita il prop `icon`)
+(L.Marker.prototype as any).options.icon = defaultIcon;
 
 function ClickHandler({ onClick }: { onClick: (lat: number, lng: number) => void }) {
   useMapEvents({
@@ -44,19 +48,17 @@ export default function MapLeaflet({
   const key = process.env.NEXT_PUBLIC_MAPTILER_KEY!;
   const tiles = `https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${key}`;
 
-return (
-<MapContainer style={{ height: 340, width: "100%" }}>
-  <Recenter lat={center.lat} lng={center.lng} zoom={zoom} />
-  <TileLayer url={tiles} />  {/* <- niente attribution qui */}
-  {onClick && <ClickHandler onClick={onClick} />}
-  {pins.map((p) => (
-    <Marker key={p.id} position={[p.lat, p.lng]} icon={markerIcon}>
-      <Popup>{p.title}</Popup>
-    </Marker>
-  ))}
-</MapContainer>
-
-);
-
+  return (
+    <MapContainer style={{ height: 340, width: "100%" }}>
+      <Recenter lat={center.lat} lng={center.lng} zoom={zoom} />
+      <TileLayer url={tiles} />
+      {onClick && <ClickHandler onClick={onClick} />}
+      {pins.map((p) => (
+        <Marker key={p.id} position={[p.lat, p.lng]}>
+          <Popup>{p.title}</Popup>
+        </Marker>
+      ))}
+    </MapContainer>
+  );
 }
 
