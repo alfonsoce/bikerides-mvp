@@ -461,8 +461,12 @@ export default function BikeRidesPrototype() {
         <Section title="Mappa & Uscite">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="rounded-3xl overflow-hidden border bg-white">
-              <TinyMap center={center} pins={pins} onClick={handleMapClick} />
-            </div>
+  <MapLeaflet
+    center={center}
+    pins={pins}
+    onClick={(lat, lng) => handleMapClick({ lat, lng })}
+  />
+</div>
             <div className="grid gap-3">
               {visibleRides.length === 0 && (
                 <div className="rounded-3xl border p-6 text-center text-gray-600 bg-white">Nessuna uscita nei filtri. Prova ad allargare il raggio o cambia parametri.</div>
