@@ -50,7 +50,7 @@ export default function MapLeaflet({
 
   // Stato interno del centro: usa prop se arriva, altrimenti Milano + GPS
   const [center, setCenter] = useState<{ lat: number; lng: number }>(
-    centerProp ?? { lat: 45.4642, lng: 9.19 } // Milano
+    centerProp ?? { lat: 40.8518, lng: 14.2681 } // Napoli
   );
 
   // Se la prop `center` cambia, aggiorna lo stato (controllo esterno)
