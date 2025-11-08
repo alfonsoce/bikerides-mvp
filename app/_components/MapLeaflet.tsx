@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 
@@ -14,7 +14,7 @@ const defaultIcon = new L.Icon({
   iconAnchor: [12, 41],
 });
 
-// Imposta l'icona come default per tutti i Marker (evita il prop `icon`)
+// Imposta l'icona default per tutti i marker
 (L.Marker.prototype as any).options.icon = defaultIcon;
 
 function ClickHandler({ onClick }: { onClick: (lat: number, lng: number) => void }) {
@@ -35,18 +35,39 @@ function Recenter({ lat, lng, zoom }: { lat: number; lng: number; zoom: number }
 }
 
 export default function MapLeaflet({
-  center,
-  zoom = 10,
+  zoom = 12,
   pins = [],
   onClick,
 }: {
-  center: { lat: number; lng: number };
   zoom?: number;
   pins?: Pin[];
   onClick?: (lat: number, lng: number) => void;
 }) {
   const key = process.env.NEXT_PUBLIC_MAPTILER_KEY!;
   const tiles = `https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${key}`;
+
+  // Stato per la posizione attuale
+  const [center, setCenter] = useState<{ lat: number; lng: number }>({
+    lat: 40.8518, // Napoli
+    lng: 14.2681,
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && "geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setCenter({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        },
+        (err) => {
+          console.warn("GPS non disponibile, uso default:", err.message);
+        },
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
+    }
+  }, []);
 
   return (
     <MapContainer style={{ height: 340, width: "100%" }}>
@@ -61,4 +82,3 @@ export default function MapLeaflet({
     </MapContainer>
   );
 }
-
