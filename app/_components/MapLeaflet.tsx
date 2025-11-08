@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 
 type Pin = { id: string; lat: number; lng: number; title: string };
@@ -16,9 +16,17 @@ const markerIcon = new L.Icon({
 function ClickHandler({ onClick }: { onClick: (lat: number, lng: number) => void }) {
   useMapEvents({
     click(e) {
-      onClick(e.latlng.lat, e.latlng.lng);
+      onClick?.(e.latlng.lat, e.latlng.lng);
     },
   });
+  return null;
+}
+
+function Recenter({ lat, lng, zoom }: { lat: number; lng: number; zoom: number }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lng], zoom, { animate: false });
+  }, [lat, lng, zoom, map]);
   return null;
 }
 
@@ -33,21 +41,15 @@ export default function MapLeaflet({
   pins?: Pin[];
   onClick?: (lat: number, lng: number) => void;
 }) {
-  // fix per dimensioni quando il container cambia
-  useEffect(() => {
-    // niente: react-leaflet gestisce da solo al mount
-  }, []);
-
   const key = process.env.NEXT_PUBLIC_MAPTILER_KEY!;
   const tiles = `https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${key}`;
 
   return (
     <MapContainer
-      center={[center.lat, center.lng]}
-      zoom={zoom}
       style={{ height: 340, width: "100%" }}
       scrollWheelZoom={true}
     >
+      <Recenter lat={center.lat} lng={center.lng} zoom={zoom} />
       <TileLayer url={tiles} attribution='&copy; OpenStreetMap &copy; MapTiler' />
       {onClick && <ClickHandler onClick={onClick} />}
       {pins.map((p) => (
